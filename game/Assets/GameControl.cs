@@ -46,7 +46,7 @@ public class GameControl: MonoBehaviour
                 GameObject newApple = Instantiate(apple, newPos, Quaternion.identity);
                 AppleMeta _am = newApple.GetComponent<AppleMeta>();
                 newApple.name = "Apple (" + System.Convert.ToString(i) + " ," + System.Convert.ToString(j) + ")";
-                _am.number = Random.Range(1, 9);
+                _am.number = Random.Range(1, 10);
                 applesList.Add(_am);
             }
         }
