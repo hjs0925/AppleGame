@@ -1,6 +1,7 @@
 ScriptsOnlyBuild:
   usedScripts:
     Assembly-CSharp.dll:
+    - AddScore
     - AppleMeta
     - ButtonControl
     - GameControl
@@ -57,7 +58,11 @@ ScriptsOnlyBuild:
       Script: {instanceID: 0}
     - Class: 48
       Script: {instanceID: 0}
+    - Class: 50
+      Script: {instanceID: 0}
     - Class: 58
+      Script: {instanceID: 0}
+    - Class: 61
       Script: {instanceID: 0}
     - Class: 81
       Script: {instanceID: 0}
@@ -89,6 +94,8 @@ ScriptsOnlyBuild:
       Script: {instanceID: 3104}
     - Class: 114
       Script: {instanceID: 4206}
+    - Class: 114
+      Script: {instanceID: 29746}
     - Class: 115
       Script: {instanceID: 0}
     - Class: 128
@@ -231,7 +238,7 @@ ScriptsOnlyBuild:
     className: Selectable
   - hash:
       serializedVersion: 2
-      Hash: 319fef0031c5b2ee0e47ce74eb9de4f5
+      Hash: 2af66c4b9c17ff31e2fb82a3ac18275c
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: GameControl
@@ -357,7 +364,7 @@ ScriptsOnlyBuild:
     className: TextMeshProUGUI
   - hash:
       serializedVersion: 2
-      Hash: 387b6346245d8fb923ebe12b4ae3f48a
+      Hash: 0ba7a4cc9534bd0ef82a14788cbf6296
     assemblyName: Assembly-CSharp.dll
     namespaceName: 
     className: AppleMeta
@@ -709,6 +716,12 @@ ScriptsOnlyBuild:
     assemblyName: Unity.2D.IK.Runtime.dll
     namespaceName: UnityEngine.U2D.IK
     className: FabrikSolver2D
+  - hash:
+      serializedVersion: 2
+      Hash: 1d9ebf9e7ae6931e6ea10c07a5b1a666
+    assemblyName: Assembly-CSharp.dll
+    namespaceName: 
+    className: AddScore
   platform: 13
   scenePathNames:
   - Assets/Title.unity

@@ -8,6 +8,7 @@ using TMPro;
 public class GameControl: MonoBehaviour
 {
     [Header("Editor Setting")]
+    public GameObject canvas;
     public GameObject apple;
     public RectTransform selectBox;
     public RectTransform collideBox;
@@ -15,14 +16,18 @@ public class GameControl: MonoBehaviour
     public GameObject gameOver;
     public TextMeshProUGUI gameOverText;
     public GameObject timeSlider;
+    public TextMeshProUGUI addScoreText;
 
     [Header("Game Settings")]
     public int horizontalLength;
     public int verticalLength;
+    public float comboTime;
 
     [Header("Only for Read")]
     public int nothing;
     public int score = 0;
+    public float comboDelta = 0f;
+    public int comboCnt;
 
     private Vector2 startpos = Vector2.zero;
     private Rect selectRect = new Rect();
@@ -32,11 +37,16 @@ public class GameControl: MonoBehaviour
 
     private TimeManager TM;
 
+    private int[,] mapApple;
+    private List<Vector2> hints;
+
     private void Awake()
     {
         Vector3 zeroPos = apple.transform.position;
         applesList = new List<AppleMeta>();
         selectList = new List<AppleMeta>();
+        mapApple = new int[verticalLength, horizontalLength];
+        hints = new List<Vector2>();
 
         for (int i = 0; i< verticalLength; i++)
         {
@@ -45,8 +55,10 @@ public class GameControl: MonoBehaviour
                 Vector3 newPos = new Vector3 (zeroPos.x + j, zeroPos.y + i, zeroPos.z);
                 GameObject newApple = Instantiate(apple, newPos, Quaternion.identity);
                 AppleMeta _am = newApple.GetComponent<AppleMeta>();
-                newApple.name = "Apple (" + System.Convert.ToString(i) + " ," + System.Convert.ToString(j) + ")";
-                _am.number = Random.Range(1, 10);
+                newApple.name = string.Format("Apple ({0}, {1})", i, j);
+                int _number = Random.Range(1, 10);
+                _am.number = _number;
+                mapApple[i, j] = _number;
                 applesList.Add(_am);
             }
         }
@@ -63,6 +75,41 @@ public class GameControl: MonoBehaviour
 
         TM = timeSlider.GetComponent<TimeManager>();
         gameOver.SetActive(false);
+
+        /*
+        #region 힌트
+        Vector2 vector = new Vector2();
+        for (int x = 0; x < verticalLength; x++)
+        {
+            for (int y = 0; y < horizontalLength; y++)
+            {
+                int sum = mapApple[x, y];
+                // 가로로 탐색
+                for (int k = y; k < horizontalLength; k++)
+                {
+                    sum += mapApple[x, k];
+                    if (sum > 10) break;
+                    if (sum == 10) 
+                    {
+                        vector.Set(x, k);
+                        hints.Add(vector);
+                    }
+                }
+                // 세로로 탐색
+                for (int k = x; k < verticalLength; k++)
+                {
+                    sum += mapApple[k, y];
+                    if (sum > 10) break;
+                    if (sum == 10)
+                    {
+                        vector.Set(k, y);
+                        hints.Add(vector);
+                    }
+                }
+            }
+        }
+        #endregion
+        */
     }
 
     // Update is called once per frame
@@ -82,7 +129,7 @@ public class GameControl: MonoBehaviour
 
             calculateAnswer();
 
-            scoreText.text = "Score: " + System.Convert.ToString(score);
+            scoreText.text = string.Format("Score: {0}", score);
         }
     }
 
@@ -92,7 +139,7 @@ public class GameControl: MonoBehaviour
         {
             everyApple.isOn = false;
         }
-        gameOverText.text = "Game Over\n\nYour Score: " + System.Convert.ToString(score);
+        gameOverText.text = string.Format("Game Over\n\nYour Score: {0}", score);
     }
 
     private void calculateAnswer()
@@ -109,19 +156,49 @@ public class GameControl: MonoBehaviour
 
         if (sum == 10)
         {
-            animateCorrect();
-            score += cnt;
+            /* 추가기능 #3 */
+            // 제한 시간 안에 연속적으로 성공하면 콤보
+            if (Time.time - comboDelta < comboTime && comboDelta != 0)
+            {
+                comboCnt += 1;
+                comboDelta = Time.time;
+            }
+            else
+            {
+                comboCnt = 0;
+                comboDelta = Time.time;
+            }
+
+            /* 추가기능 #4 */
+            // 3개 이상의 사과들을 묶어서 터뜨린 경우 점수 +10
+            if (cnt >= 3)
+            {
+                animateCorrect(cnt, comboCnt, true);
+                score += cnt + 10 + comboCnt*5;
+            }
+            else
+            {
+                animateCorrect(cnt, comboCnt, false);
+                score += cnt + comboCnt*5;
+            }
         }
         selectList.Clear();
     }
 
-    private void animateCorrect()
+    private void animateCorrect(int _score, int combo, bool isMany)
     {
         foreach(AppleMeta selectedApple in selectList)
         {
             // 사과의 성공적 제거
-            selectedApple.isOn = false;
+            selectedApple.isAnimated = true;
         }
+
+        Vector2 midPos = new Vector2(selectBox.position.x + selectBox.rect.center.x, selectBox.position.y + selectBox.rect.center.y);
+        TextMeshProUGUI addScore = Instantiate(addScoreText, midPos, Quaternion.identity);
+        addScore.transform.SetParent(canvas.transform);
+        addScore.gameObject.SetActive(true);
+        AddScore AS = addScore.GetComponent<AddScore>();
+        AS.print(_score, combo, isMany);
     }
 
     private void SelectSystem()
@@ -160,7 +237,7 @@ public class GameControl: MonoBehaviour
                 if (!i.CompareTag("apple"))
                     continue;
 
-                AppleMeta hitApple = i.transform.parent.gameObject.GetComponent<AppleMeta>();
+                AppleMeta hitApple = i.gameObject.GetComponent<AppleMeta>();
 
                 // collide한 사과가 이미 새로 영역에 들어온 사과면,
                 if (!hitApple.isSelected)
