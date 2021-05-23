@@ -29,22 +29,22 @@
    - fSliderBarTime 값에서 Time.deltaTime을 빼 제한시간 구현
    - fSliderBarTime 값이 0이 되면 GameOver
 
-ver1.1
+*ver1.1*
 
 5. 사과 제거 효과
 
-- correctAnswer에서 AppleMeta의 isAnimated flag를 켜면, update함수에서 효과실행
-- 사과의 위치를 다른 사과들보다 앞에 그려지도록 카메라쪽으로 1만큼 이동
-- RigidBody2D의 bodyType을 중력효과를 받는 Dynamic으로 바꿈
-- throwForces 배열의 벡터값 중 랜덤한 값으로 힘을 줘 던져지는 효과를 줌
-- Collector Object와 충돌하면 isOn이 false가 되며 disable됨
+   - correctAnswer에서 AppleMeta의 isAnimated flag를 켜면, update함수에서 효과실행
+   - 사과의 위치를 다른 사과들보다 앞에 그려지도록 카메라쪽으로 1만큼 이동
+   - RigidBody2D의 bodyType을 중력효과를 받는 Dynamic으로 바꿈
+   - throwForces 배열의 벡터값 중 랜덤한 값으로 힘을 줘 던져지는 효과를 줌
+   - Collector Object와 충돌하면 isOn이 false가 되며 disable됨
 
-ver1.1
+*ver1.1*
 
 6. 점수 추가 UI
 
-- AddScoreText prefab을 Instantiate로 SelectBox의 중앙에 생성
-- AddScore 스크립트로 moveSpeed와 DestroyTime값 만큼 위로 이동시키고 시간 후 없앰
+   - AddScoreText prefab을 Instantiate로 SelectBox의 중앙에 생성
+   - AddScore 스크립트로 moveSpeed와 DestroyTime값 만큼 위로 이동시키고 시간 후 없앰
 
 < 추가 기능 >
 
@@ -56,21 +56,21 @@ ver1.1
 
    -
 
-ver1.1
+*ver1.1*
 
 3. 플레이어가 제한 시간 안에 연속적으로 10을 만들었을 때 콤보로 판단하고 점수를 올리는 시스템
 
-- calculateAnswer함수에서 comboDelta 함수에 time을 저장
-- comboDelta이 time과의 차가 comboTime보다 작고, 초기값이 아니면 combo += 1
-- combo 값을 animateCorrect로 넘겨주고, score에도 추가
+   - calculateAnswer함수에서 comboDelta 함수에 time을 저장
+   - comboDelta이 time과의 차가 comboTime보다 작고, 초기값이 아니면 combo += 1
+   - combo 값을 animateCorrect로 넘겨주고, score에도 추가
 
-ver1.1
+*ver1.1*
 
 4. 3개 이상의 사과들을 묶어서 터뜨린 경우 점수 +10
 
-- calculateAnswer함수에서 cnt변수에 selectedApple의 개수를 저장
-- cnt가 3이상이면 점수를 10점 더 추가
-- animateCorrect에 isMany flag를 true로 넘겨 UI로 표시
+   - calculateAnswer함수에서 cnt변수에 selectedApple의 개수를 저장
+   - cnt가 3이상이면 점수를 10점 더 추가
+   - animateCorrect에 isMany flag를 true로 넘겨 UI로 표시
 
 5. 업적 시스템
 
@@ -80,7 +80,9 @@ ver1.1
 
    -
 
-7. ## 사과가 없어진 후 위에 사과들이 내려오는 중력 모드 추가
+7. 사과가 없어진 후 위에 사과들이 내려오는 중력 모드 추가
+
+   - 
 
 ---
 
