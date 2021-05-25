@@ -8,8 +8,9 @@ public class AppleMeta : MonoBehaviour
     public bool isOn;
     public bool isSelected;
     public bool isAnimated;
+    public Vector2Int coor;
 
-    private Transform selectZone;
+    private Transform selectZone;   // 선택되었을 때, 하이라이트
     private Rigidbody2D RB;
 
     private List<Vector2> throwForces;

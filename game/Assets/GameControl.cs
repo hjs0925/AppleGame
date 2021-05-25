@@ -17,6 +17,7 @@ public class GameControl: MonoBehaviour
     public TextMeshProUGUI gameOverText;
     public GameObject timeSlider;
     public TextMeshProUGUI addScoreText;
+    public RectTransform hintBox;
 
     [Header("Game Settings")]
     public int horizontalLength;
@@ -29,6 +30,7 @@ public class GameControl: MonoBehaviour
     public float comboDelta = 0f;
     public int comboCnt;
 
+    private Vector3 zeroPos;
     private Vector2 startpos = Vector2.zero;
     private Rect selectRect = new Rect();
 
@@ -38,15 +40,16 @@ public class GameControl: MonoBehaviour
     private TimeManager TM;
 
     private int[,] mapApple;
-    private List<Vector2> hints;
+    public List<Vector4> hints;    // x, y : 힌트 시작 좌표 z, w : 힌트 끝 좌표
+    private List<Vector2Int> answerCoors;
 
     private void Awake()
     {
-        Vector3 zeroPos = apple.transform.position;
+        zeroPos = apple.transform.position;
         applesList = new List<AppleMeta>();
         selectList = new List<AppleMeta>();
         mapApple = new int[verticalLength, horizontalLength];
-        hints = new List<Vector2>();
+        hints = new List<Vector4>();
 
         for (int i = 0; i< verticalLength; i++)
         {
@@ -58,6 +61,7 @@ public class GameControl: MonoBehaviour
                 newApple.name = string.Format("Apple ({0}, {1})", i, j);
                 int _number = Random.Range(1, 10);
                 _am.number = _number;
+                _am.coor = new Vector2Int(i, j);
                 mapApple[i, j] = _number;
                 applesList.Add(_am);
             }
@@ -76,40 +80,8 @@ public class GameControl: MonoBehaviour
         TM = timeSlider.GetComponent<TimeManager>();
         gameOver.SetActive(false);
 
-        /*
-        #region 힌트
-        Vector2 vector = new Vector2();
-        for (int x = 0; x < verticalLength; x++)
-        {
-            for (int y = 0; y < horizontalLength; y++)
-            {
-                int sum = mapApple[x, y];
-                // 가로로 탐색
-                for (int k = y; k < horizontalLength; k++)
-                {
-                    sum += mapApple[x, k];
-                    if (sum > 10) break;
-                    if (sum == 10) 
-                    {
-                        vector.Set(x, k);
-                        hints.Add(vector);
-                    }
-                }
-                // 세로로 탐색
-                for (int k = x; k < verticalLength; k++)
-                {
-                    sum += mapApple[k, y];
-                    if (sum > 10) break;
-                    if (sum == 10)
-                    {
-                        vector.Set(k, y);
-                        hints.Add(vector);
-                    }
-                }
-            }
-        }
-        #endregion
-        */
+        FindHints();
+
     }
 
     // Update is called once per frame
@@ -135,6 +107,7 @@ public class GameControl: MonoBehaviour
 
     private void clearGame()
     {
+        hintBox.gameObject.SetActive(false);
         foreach (AppleMeta everyApple in applesList)
         {
             everyApple.isOn = false;
@@ -151,13 +124,16 @@ public class GameControl: MonoBehaviour
         foreach(AppleMeta selectedApple in selectList)
         {
             sum += selectedApple.number;
+            // 선택된 사과들의 좌표 모음
+            answerCoors.Add(selectedApple.coor);
             cnt += 1;
         }
 
         if (sum == 10)
         {
-            /* 추가기능 #3 */
-            // 제한 시간 안에 연속적으로 성공하면 콤보
+            hintBox.gameObject.SetActive(false);
+
+            #region 추가기능 #3 - 제한 시간 안에 연속적으로 성공하면 콤보
             if (Time.time - comboDelta < comboTime && comboDelta != 0)
             {
                 comboCnt += 1;
@@ -168,9 +144,9 @@ public class GameControl: MonoBehaviour
                 comboCnt = 0;
                 comboDelta = Time.time;
             }
+            #endregion
 
-            /* 추가기능 #4 */
-            // 3개 이상의 사과들을 묶어서 터뜨린 경우 점수 +10
+            #region 추가기능 #4 - 3개 이상의 사과들을 묶어서 터뜨린 경우 점수 +10
             if (cnt >= 3)
             {
                 animateCorrect(cnt, comboCnt, true);
@@ -181,8 +157,19 @@ public class GameControl: MonoBehaviour
                 animateCorrect(cnt, comboCnt, false);
                 score += cnt + comboCnt*5;
             }
+            #endregion
+
+            /* 추가기능 #1 */
+            // 정답 노드의 값을 0으로 만들고 힌트를 새로 탐색
+            foreach(Vector2Int answerCoor in answerCoors)
+            {
+                mapApple[answerCoor.x, answerCoor.y] = 0;
+            }
+            hints.Clear();
+            FindHints();
         }
         selectList.Clear();
+        answerCoors.Clear();
     }
 
     private void animateCorrect(int _score, int combo, bool isMany)
@@ -310,6 +297,44 @@ public class GameControl: MonoBehaviour
         collideBox.offsetMax = Camera.main.ScreenToWorldPoint(selectRect.max);
     }
 
+    private void FindHints()
+    {
+        answerCoors = new List<Vector2Int>();
+        Vector4 vector = new Vector4(); // 힌트 시작사과좌표, 끝사과좌표
+        int sum = 0;
+        for (int x = 0; x < verticalLength; x++)
+        {
+            for (int y = 0; y < horizontalLength; y++)
+            {
+                // sum을 현재 노드로 초기화
+                sum = 0;
+                // 가로로 탐색
+                for (int k = y; k < horizontalLength; k++)
+                {
+                    sum += mapApple[x, k];
+                    if (sum > 10) break;
+                    if (sum == 10)
+                    {
+                        vector.Set(x, y, x, k);
+                        hints.Add(vector);
+                    }
+                }
+                sum = 0;
+                // 세로로 탐색
+                for (int k = x; k < verticalLength; k++)
+                {
+                    sum += mapApple[k, y];
+                    if (sum > 10) break;
+                    if (sum == 10)
+                    {
+                        vector.Set(x, y, k, y);
+                        hints.Add(vector);
+                    }
+                }
+            }
+        }
+    }
+
     #region 버튼 액션
     public void OnResetButton()
     {
@@ -319,6 +344,23 @@ public class GameControl: MonoBehaviour
     public void OnHomeButton()
     {
         SceneManager.LoadScene("Title");
+    }
+
+    public void OnHintButton()
+    {
+        if (hints.Count == 0)
+        {
+            Debug.Log("No more Hints!");
+        }
+        else
+        {
+            Vector4 hint = hints[0];
+            Vector2 hintOffsetMin = new Vector2(zeroPos.x + hint.y - 0.5f, zeroPos.y + hint.x - 0.5f);
+            Vector2 hintOffsetMax = new Vector2(zeroPos.x + hint.w + 0.5f, zeroPos.y + hint.z + 0.5f);
+            hintBox.offsetMin = Camera.main.WorldToScreenPoint(hintOffsetMin);
+            hintBox.offsetMax = Camera.main.WorldToScreenPoint(hintOffsetMax);
+            hintBox.gameObject.SetActive(true);
+        }
     }
     #endregion
 }
