@@ -2,7 +2,7 @@
 
 #### 영상
 
-[![시연영상](./version/thumnail_ver1.1.jpg)](./version/시연영상_ver.1.1.mkv)
+[![시연영상](./versions/thumnail_ver1.1.jpg)](https://www.youtube.com/watch?v=0GMh36advCI)
 
 #### 사과게임 설계문서
 
