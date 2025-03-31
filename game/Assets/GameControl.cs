@@ -40,8 +40,9 @@ public class GameControl: MonoBehaviour
     private TimeManager TM;
 
     private int[,] mapApple;
-    public List<Vector4> hints;    // x, y : ÈùÆ® ½ÃÀÛ ÁÂÇ¥ z, w : ÈùÆ® ³¡ ÁÂÇ¥
+    public List<Vector4> hints;    // x, y : ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ç¥ z, w : ï¿½ï¿½Æ® ï¿½ï¿½ ï¿½ï¿½Ç¥
     private List<Vector2Int> answerCoors;
+
 
     private void Awake()
     {
@@ -71,6 +72,7 @@ public class GameControl: MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Screen.SetResolution(1920, 1080, true);
         foreach (AppleMeta _apple in applesList)
         {
             _apple.gameObject.SetActive(true);
@@ -124,7 +126,7 @@ public class GameControl: MonoBehaviour
         foreach(AppleMeta selectedApple in selectList)
         {
             sum += selectedApple.number;
-            // ¼±ÅÃµÈ »ç°úµéÀÇ ÁÂÇ¥ ¸ðÀ½
+            // ï¿½ï¿½ï¿½Ãµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ç¥ ï¿½ï¿½ï¿½ï¿½
             answerCoors.Add(selectedApple.coor);
             cnt += 1;
         }
@@ -133,7 +135,7 @@ public class GameControl: MonoBehaviour
         {
             hintBox.gameObject.SetActive(false);
 
-            #region Ãß°¡±â´É #3 - Á¦ÇÑ ½Ã°£ ¾È¿¡ ¿¬¼ÓÀûÀ¸·Î ¼º°øÇÏ¸é ÄÞº¸
+            #region ï¿½ß°ï¿½ï¿½ï¿½ï¿½ #3 - ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ ï¿½È¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï¸ï¿½ ï¿½Þºï¿½
             if (Time.time - comboDelta < comboTime && comboDelta != 0)
             {
                 comboCnt += 1;
@@ -146,7 +148,7 @@ public class GameControl: MonoBehaviour
             }
             #endregion
 
-            #region Ãß°¡±â´É #4 - 3°³ ÀÌ»óÀÇ »ç°úµéÀ» ¹­¾î¼­ ÅÍ¶ß¸° °æ¿ì Á¡¼ö +10
+            #region ï¿½ß°ï¿½ï¿½ï¿½ï¿½ #4 - 3ï¿½ï¿½ ï¿½Ì»ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½î¼­ ï¿½Í¶ß¸ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ +10
             if (cnt >= 3)
             {
                 animateCorrect(cnt, comboCnt, true);
@@ -159,8 +161,8 @@ public class GameControl: MonoBehaviour
             }
             #endregion
 
-            /* Ãß°¡±â´É #1 */
-            // Á¤´ä ³ëµåÀÇ °ªÀ» 0À¸·Î ¸¸µé°í ÈùÆ®¸¦ »õ·Î Å½»ö
+            /* ï¿½ß°ï¿½ï¿½ï¿½ï¿½ #1 */
+            // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ 0ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ Å½ï¿½ï¿½
             foreach(Vector2Int answerCoor in answerCoors)
             {
                 mapApple[answerCoor.x, answerCoor.y] = 0;
@@ -176,7 +178,7 @@ public class GameControl: MonoBehaviour
     {
         foreach(AppleMeta selectedApple in selectList)
         {
-            // »ç°úÀÇ ¼º°øÀû Á¦°Å
+            // ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             selectedApple.isAnimated = true;
         }
 
@@ -190,7 +192,7 @@ public class GameControl: MonoBehaviour
 
     private void SelectSystem()
     {
-        // ¼±ÅÃÀ» ¸¶ÃÆÀ» ¶§, select flag°¡ ÄÑÁ®ÀÖ´Â »ç°ú´Â selectList¿¡ Ãß°¡
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½, select flagï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ selectListï¿½ï¿½ ï¿½ß°ï¿½
         if (Input.GetMouseButtonUp(0))
         {
             foreach (AppleMeta everyApple in applesList)
@@ -199,7 +201,7 @@ public class GameControl: MonoBehaviour
             }
         }
 
-        // ¼±ÅÃÀ» ¸¶Ä£°Ô ¾Æ´Ï¸é, select flag ÃÊ±âÈ­
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä£ï¿½ï¿½ ï¿½Æ´Ï¸ï¿½, select flag ï¿½Ê±ï¿½È­
         else
         {
             foreach(AppleMeta everyApple in applesList)
@@ -208,16 +210,16 @@ public class GameControl: MonoBehaviour
             }
         }
 
-        // ¼±ÅÃ¹Ú½º°¡ ÄÑÁ®ÀÖ´Â µ¿¾È, ¹Ú½º ³»ÀÇ »ç°úÀÇ select flag¸¦ ÄÑÁØ´Ù.
+        // ï¿½ï¿½ï¿½Ã¹Ú½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½, ï¿½Ú½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ select flagï¿½ï¿½ ï¿½ï¿½ï¿½Ø´ï¿½.
         if (selectBox.gameObject.activeSelf)
         {
-            // ¸ðµç »ç°úÀÇ ¼±ÅÃÀ» ÃÊ±âÈ­
+            // ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­
             foreach (AppleMeta everyApple in applesList)
             {
                 everyApple.isSelected = false;
             }
 
-            // ÄÝ¶óÀÌ´õ·Î ¼±ÅÃÀ» ¼³Á¤
+            // ï¿½Ý¶ï¿½ï¿½Ì´ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             Collider2D[] hit = Physics2D.OverlapBoxAll(collideBox.anchoredPosition, collideBox.sizeDelta, 0f);
             foreach (Collider2D i in hit)
             {
@@ -226,7 +228,7 @@ public class GameControl: MonoBehaviour
 
                 AppleMeta hitApple = i.gameObject.GetComponent<AppleMeta>();
 
-                // collideÇÑ »ç°ú°¡ ÀÌ¹Ì »õ·Î ¿µ¿ª¿¡ µé¾î¿Â »ç°ú¸é,
+                // collideï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½,
                 if (!hitApple.isSelected)
                 {
                     hitApple.isSelected = true;
@@ -237,7 +239,7 @@ public class GameControl: MonoBehaviour
 
     private void DragSystem()
     {
-        #region Ã³À½ Å¬¸¯ÇÑ ÁÂÇ¥ ÀúÀå
+        #region Ã³ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ç¥ ï¿½ï¿½ï¿½ï¿½
         if (Input.GetMouseButtonDown(0))
         {
             selectBox.gameObject.SetActive(true);
@@ -249,33 +251,33 @@ public class GameControl: MonoBehaviour
         }
         #endregion
 
-        #region µå·¡±× ÁßÀÏ ¶§
+        #region ï¿½å·¡ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
         if (Input.GetMouseButton(0))
         {
             if (Input.mousePosition.x > startpos.x)
             {
-                // Ã³À½ Å¬¸¯ÇÑ °÷¿¡¼­ ¿À¸¥ÂÊÀ¸·Î µå·¡±×ÇÒ °æ¿ì
+                // Ã³ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½å·¡ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
                 selectRect.xMin = startpos.x;
                 selectRect.xMax = Input.mousePosition.x;
             }
 
             else
             {
-                // Ã³À½ Å¬¸¯ÇÑ °÷¿¡¼­ ¿ÞÂÊÀ¸·Î µå·¡±×ÇÒ °æ¿ì
+                // Ã³ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½å·¡ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
                 selectRect.xMin = Input.mousePosition.x;
                 selectRect.xMax = startpos.x;
             }
 
             if (Input.mousePosition.y > startpos.y)
             {
-                // Ã³À½ Å¬¸¯ÇÑ °÷¿¡¼­ À§ÂÊÀ¸·Î µå·¡±×ÇÒ °æ¿ì
+                // Ã³ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½å·¡ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
                 selectRect.yMin = startpos.y;
                 selectRect.yMax = Input.mousePosition.y;
             }
 
             else
             {
-                // Ã³À½ Å¬¸¯ÇÑ °÷¿¡¼­ ¾Æ·¡ÂÊÀ¸·Î µå·¡±×ÇÒ °æ¿ì
+                // Ã³ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Æ·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½å·¡ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
                 selectRect.yMin = Input.mousePosition.y;
                 selectRect.yMax = startpos.y;
             }
@@ -289,7 +291,7 @@ public class GameControl: MonoBehaviour
         if (selectRect.yMax > Screen.height) selectRect.yMax = Screen.height;
         #endregion
 
-        // »çÀÌÁî ¹Ý¿µ
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ý¿ï¿½
         selectBox.offsetMin = selectRect.min;
         selectBox.offsetMax = selectRect.max;
 
@@ -300,15 +302,15 @@ public class GameControl: MonoBehaviour
     private void FindHints()
     {
         answerCoors = new List<Vector2Int>();
-        Vector4 vector = new Vector4(); // ÈùÆ® ½ÃÀÛ»ç°úÁÂÇ¥, ³¡»ç°úÁÂÇ¥
+        Vector4 vector = new Vector4(); // ï¿½ï¿½Æ® ï¿½ï¿½ï¿½Û»ï¿½ï¿½ï¿½ï¿½Ç¥, ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç¥
         int sum = 0;
         for (int x = 0; x < verticalLength; x++)
         {
             for (int y = 0; y < horizontalLength; y++)
             {
-                // sumÀ» ÇöÀç ³ëµå·Î ÃÊ±âÈ­
+                // sumï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­
                 sum = 0;
-                // °¡·Î·Î Å½»ö
+                // ï¿½ï¿½ï¿½Î·ï¿½ Å½ï¿½ï¿½
                 for (int k = y; k < horizontalLength; k++)
                 {
                     sum += mapApple[x, k];
@@ -320,7 +322,7 @@ public class GameControl: MonoBehaviour
                     }
                 }
                 sum = 0;
-                // ¼¼·Î·Î Å½»ö
+                // ï¿½ï¿½ï¿½Î·ï¿½ Å½ï¿½ï¿½
                 for (int k = x; k < verticalLength; k++)
                 {
                     sum += mapApple[k, y];
@@ -335,7 +337,7 @@ public class GameControl: MonoBehaviour
         }
     }
 
-    #region ¹öÆ° ¾×¼Ç
+    #region ï¿½ï¿½Æ° ï¿½×¼ï¿½
     public void OnResetButton()
     {
         SceneManager.LoadScene("Main");
