@@ -1,24 +1,19 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class TimeManager : MonoBehaviour
 {
-    Slider slTimer;
     public float fSliderBarTime;
     public bool isEnd = false;
-
     private float maxBarTime;
 
-    // Start is called before the first frame update
+    public Image clockImage; // 시계 이미지 연결
+
     void Start()
     {
-        slTimer = GetComponent<Slider>();
         maxBarTime = fSliderBarTime;
     }
 
-    // Update is called once per frame
     void Update()
     {
         fSliderBarTime -= Time.deltaTime;
@@ -28,7 +23,7 @@ public class TimeManager : MonoBehaviour
             fSliderBarTime = 0f;
         }
 
-        slTimer.value = fSliderBarTime / maxBarTime;
-
+        float ratio = fSliderBarTime / maxBarTime;
+        clockImage.fillAmount = ratio;
     }
 }

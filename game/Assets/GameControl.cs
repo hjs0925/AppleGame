@@ -5,8 +5,10 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
 
-public class GameControl: MonoBehaviour
+public class GameControl : MonoBehaviour
 {
+    public enum GameMode { Add, Subtract }
+
     [Header("Editor Setting")]
     public GameObject canvas;
     public GameObject apple;
@@ -18,6 +20,7 @@ public class GameControl: MonoBehaviour
     public GameObject timeSlider;
     public TextMeshProUGUI addScoreText;
     public RectTransform hintBox;
+    public TextMeshProUGUI modeText;
 
     [Header("Game Settings")]
     public int horizontalLength;
@@ -30,6 +33,8 @@ public class GameControl: MonoBehaviour
     public float comboDelta = 0f;
     public int comboCnt;
 
+    public GameMode currentMode = GameMode.Add;
+
     private Vector3 zeroPos;
     private Vector2 startpos = Vector2.zero;
     private Rect selectRect = new Rect();
@@ -40,9 +45,8 @@ public class GameControl: MonoBehaviour
     private TimeManager TM;
 
     private int[,] mapApple;
-    public List<Vector4> hints;    // x, y : ��Ʈ ���� ��ǥ z, w : ��Ʈ �� ��ǥ
+    public List<Vector4> hints;
     private List<Vector2Int> answerCoors;
-
 
     private void Awake()
     {
@@ -52,11 +56,11 @@ public class GameControl: MonoBehaviour
         mapApple = new int[verticalLength, horizontalLength];
         hints = new List<Vector4>();
 
-        for (int i = 0; i< verticalLength; i++)
+        for (int i = 0; i < verticalLength; i++)
         {
-            for (int j = 0; j< horizontalLength; j++)
+            for (int j = 0; j < horizontalLength; j++)
             {
-                Vector3 newPos = new Vector3 (zeroPos.x + j, zeroPos.y + i, zeroPos.z);
+                Vector3 newPos = new Vector3(zeroPos.x + j, zeroPos.y + i, zeroPos.z);
                 GameObject newApple = Instantiate(apple, newPos, Quaternion.identity);
                 AppleMeta _am = newApple.GetComponent<AppleMeta>();
                 newApple.name = string.Format("Apple ({0}, {1})", i, j);
@@ -69,7 +73,6 @@ public class GameControl: MonoBehaviour
         }
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         Screen.SetResolution(1920, 1080, true);
@@ -83,10 +86,9 @@ public class GameControl: MonoBehaviour
         gameOver.SetActive(false);
 
         FindHints();
-
+        UpdateModeUI();
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (TM.isEnd)
@@ -94,15 +96,11 @@ public class GameControl: MonoBehaviour
             gameOver.SetActive(true);
             clearGame();
         }
-
         else
         {
             DragSystem();
-
             SelectSystem();
-
             calculateAnswer();
-
             scoreText.text = string.Format("Score: {0}", score);
         }
     }
@@ -121,64 +119,80 @@ public class GameControl: MonoBehaviour
     {
         if (!Input.GetMouseButtonUp(0)) return;
 
-        int sum = 0;
+        int result = 0;
         int cnt = 0;
-        foreach(AppleMeta selectedApple in selectList)
+        foreach (AppleMeta selectedApple in selectList)
         {
-            sum += selectedApple.number;
-            // ���õ� ������� ��ǥ ����
             answerCoors.Add(selectedApple.coor);
             cnt += 1;
         }
 
-        if (sum == 10)
+        if (currentMode == GameMode.Add)
         {
-            hintBox.gameObject.SetActive(false);
-
-            #region �߰���� #3 - ���� �ð� �ȿ� ���������� �����ϸ� �޺�
-            if (Time.time - comboDelta < comboTime && comboDelta != 0)
+            foreach (AppleMeta selectedApple in selectList)
             {
-                comboCnt += 1;
-                comboDelta = Time.time;
+                result += selectedApple.number;
             }
-            else
+            if (result == 10)
             {
-                comboCnt = 0;
-                comboDelta = Time.time;
+                OnCorrectAnswer(cnt);
             }
-            #endregion
-
-            #region �߰���� #4 - 3�� �̻��� ������� ��� �Ͷ߸� ��� ���� +10
-            if (cnt >= 3)
-            {
-                animateCorrect(cnt, comboCnt, true);
-                score += cnt + 10 + comboCnt*5;
-            }
-            else
-            {
-                animateCorrect(cnt, comboCnt, false);
-                score += cnt + comboCnt*5;
-            }
-            #endregion
-
-            /* �߰���� #1 */
-            // ���� ����� ���� 0���� ����� ��Ʈ�� ���� Ž��
-            foreach(Vector2Int answerCoor in answerCoors)
-            {
-                mapApple[answerCoor.x, answerCoor.y] = 0;
-            }
-            hints.Clear();
-            FindHints();
         }
+        else if (currentMode == GameMode.Subtract && selectList.Count > 0)
+        {
+            result = selectList[0].number;
+            for (int i = 1; i < selectList.Count; i++)
+            {
+                result -= selectList[i].number;
+            }
+            if (result == 10)
+            {
+                OnCorrectAnswer(cnt);
+            }
+        }
+
         selectList.Clear();
         answerCoors.Clear();
     }
 
+    private void OnCorrectAnswer(int cnt)
+    {
+        hintBox.gameObject.SetActive(false);
+
+        if (Time.time - comboDelta < comboTime && comboDelta != 0)
+        {
+            comboCnt += 1;
+            comboDelta = Time.time;
+        }
+        else
+        {
+            comboCnt = 0;
+            comboDelta = Time.time;
+        }
+
+        if (cnt >= 3)
+        {
+            animateCorrect(cnt, comboCnt, true);
+            score += cnt + 10 + comboCnt * 5;
+        }
+        else
+        {
+            animateCorrect(cnt, comboCnt, false);
+            score += cnt + comboCnt * 5;
+        }
+
+        foreach (Vector2Int answerCoor in answerCoors)
+        {
+            mapApple[answerCoor.x, answerCoor.y] = 0;
+        }
+        hints.Clear();
+        FindHints();
+    }
+
     private void animateCorrect(int _score, int combo, bool isMany)
     {
-        foreach(AppleMeta selectedApple in selectList)
+        foreach (AppleMeta selectedApple in selectList)
         {
-            // ����� ������ ����
             selectedApple.isAnimated = true;
         }
 
@@ -190,56 +204,29 @@ public class GameControl: MonoBehaviour
         AS.print(_score, combo, isMany);
     }
 
-    private void SelectSystem()
+    public void OnToggleModeButton()
     {
-        // ������ ������ ��, select flag�� �����ִ� ����� selectList�� �߰�
-        if (Input.GetMouseButtonUp(0))
-        {
-            foreach (AppleMeta everyApple in applesList)
-            {
-                if (everyApple.isSelected) selectList.Add(everyApple);
-            }
-        }
-
-        // ������ ��ģ�� �ƴϸ�, select flag �ʱ�ȭ
+        if (currentMode == GameMode.Add)
+            currentMode = GameMode.Subtract;
         else
-        {
-            foreach(AppleMeta everyApple in applesList)
-            {
-                everyApple.isSelected = false;
-            }
-        }
+            currentMode = GameMode.Add;
 
-        // ���ùڽ��� �����ִ� ����, �ڽ� ���� ����� select flag�� ���ش�.
-        if (selectBox.gameObject.activeSelf)
-        {
-            // ��� ����� ������ �ʱ�ȭ
-            foreach (AppleMeta everyApple in applesList)
-            {
-                everyApple.isSelected = false;
-            }
+        UpdateModeUI();
+        FindHints();
+    }
 
-            // �ݶ��̴��� ������ ����
-            Collider2D[] hit = Physics2D.OverlapBoxAll(collideBox.anchoredPosition, collideBox.sizeDelta, 0f);
-            foreach (Collider2D i in hit)
-            {
-                if (!i.CompareTag("apple"))
-                    continue;
+    private void UpdateModeUI()
+    {
+        if (modeText == null) return;
 
-                AppleMeta hitApple = i.gameObject.GetComponent<AppleMeta>();
-
-                // collide�� ����� �̹� ���� ������ ���� �����,
-                if (!hitApple.isSelected)
-                {
-                    hitApple.isSelected = true;
-                }
-            }
-        }
+        if (currentMode == GameMode.Add)
+            modeText.text = "현재 모드: 더하기";
+        else
+            modeText.text = "현재 모드: 빼기";
     }
 
     private void DragSystem()
     {
-        #region ó�� Ŭ���� ��ǥ ����
         if (Input.GetMouseButtonDown(0))
         {
             selectBox.gameObject.SetActive(true);
@@ -249,49 +236,20 @@ public class GameControl: MonoBehaviour
         {
             selectBox.gameObject.SetActive(false);
         }
-        #endregion
 
-        #region �巡�� ���� ��
         if (Input.GetMouseButton(0))
         {
-            if (Input.mousePosition.x > startpos.x)
-            {
-                // ó�� Ŭ���� ������ ���������� �巡���� ���
-                selectRect.xMin = startpos.x;
-                selectRect.xMax = Input.mousePosition.x;
-            }
-
-            else
-            {
-                // ó�� Ŭ���� ������ �������� �巡���� ���
-                selectRect.xMin = Input.mousePosition.x;
-                selectRect.xMax = startpos.x;
-            }
-
-            if (Input.mousePosition.y > startpos.y)
-            {
-                // ó�� Ŭ���� ������ �������� �巡���� ���
-                selectRect.yMin = startpos.y;
-                selectRect.yMax = Input.mousePosition.y;
-            }
-
-            else
-            {
-                // ó�� Ŭ���� ������ �Ʒ������� �巡���� ���
-                selectRect.yMin = Input.mousePosition.y;
-                selectRect.yMax = startpos.y;
-            }
+            selectRect.xMin = Mathf.Min(Input.mousePosition.x, startpos.x);
+            selectRect.xMax = Mathf.Max(Input.mousePosition.x, startpos.x);
+            selectRect.yMin = Mathf.Min(Input.mousePosition.y, startpos.y);
+            selectRect.yMax = Mathf.Max(Input.mousePosition.y, startpos.y);
         }
-        #endregion
 
-        #region Safe Area
-        if (selectRect.xMin < 0) selectRect.xMin = 0;
-        if (selectRect.yMin < 0) selectRect.yMin = 0;
-        if (selectRect.xMax > Screen.width) selectRect.xMax = Screen.width;
-        if (selectRect.yMax > Screen.height) selectRect.yMax = Screen.height;
-        #endregion
+        selectRect.xMin = Mathf.Clamp(selectRect.xMin, 0, Screen.width);
+        selectRect.yMin = Mathf.Clamp(selectRect.yMin, 0, Screen.height);
+        selectRect.xMax = Mathf.Clamp(selectRect.xMax, 0, Screen.width);
+        selectRect.yMax = Mathf.Clamp(selectRect.yMax, 0, Screen.height);
 
-        // ������ �ݿ�
         selectBox.offsetMin = selectRect.min;
         selectBox.offsetMax = selectRect.max;
 
@@ -299,45 +257,113 @@ public class GameControl: MonoBehaviour
         collideBox.offsetMax = Camera.main.ScreenToWorldPoint(selectRect.max);
     }
 
+    private void SelectSystem()
+    {
+        if (Input.GetMouseButtonUp(0))
+        {
+            foreach (AppleMeta everyApple in applesList)
+            {
+                if (everyApple.isSelected) selectList.Add(everyApple);
+            }
+        }
+        else
+        {
+            foreach (AppleMeta everyApple in applesList)
+            {
+                everyApple.isSelected = false;
+            }
+        }
+
+        if (selectBox.gameObject.activeSelf)
+        {
+            foreach (AppleMeta everyApple in applesList)
+            {
+                everyApple.isSelected = false;
+            }
+
+            Collider2D[] hit = Physics2D.OverlapBoxAll(collideBox.anchoredPosition, collideBox.sizeDelta, 0f);
+            foreach (Collider2D i in hit)
+            {
+                if (!i.CompareTag("apple")) continue;
+
+                AppleMeta hitApple = i.gameObject.GetComponent<AppleMeta>();
+                hitApple.isSelected = true;
+            }
+        }
+    }
+
     private void FindHints()
     {
         answerCoors = new List<Vector2Int>();
-        Vector4 vector = new Vector4(); // ��Ʈ ���ۻ����ǥ, �������ǥ
+        hints.Clear();
+        Vector4 vector = new Vector4();
         int sum = 0;
+
         for (int x = 0; x < verticalLength; x++)
         {
             for (int y = 0; y < horizontalLength; y++)
             {
-                // sum�� ���� ���� �ʱ�ȭ
                 sum = 0;
-                // ���η� Ž��
+
                 for (int k = y; k < horizontalLength; k++)
                 {
-                    sum += mapApple[x, k];
-                    if (sum > 10) break;
-                    if (sum == 10)
+                    if (currentMode == GameMode.Add)
                     {
-                        vector.Set(x, y, x, k);
-                        hints.Add(vector);
+                        sum += mapApple[x, k];
+                        if (sum > 10) break;
+                        if (sum == 10)
+                        {
+                            vector.Set(x, y, x, k);
+                            hints.Add(vector);
+                        }
+                    }
+                    else if (currentMode == GameMode.Subtract)
+                    {
+                        int result = mapApple[x, y];
+                        for (int j = y + 1; j <= k; j++)
+                        {
+                            result -= mapApple[x, j];
+                        }
+                        if (result == 10)
+                        {
+                            vector.Set(x, y, x, k);
+                            hints.Add(vector);
+                        }
                     }
                 }
+
                 sum = 0;
-                // ���η� Ž��
+
                 for (int k = x; k < verticalLength; k++)
                 {
-                    sum += mapApple[k, y];
-                    if (sum > 10) break;
-                    if (sum == 10)
+                    if (currentMode == GameMode.Add)
                     {
-                        vector.Set(x, y, k, y);
-                        hints.Add(vector);
+                        sum += mapApple[k, y];
+                        if (sum > 10) break;
+                        if (sum == 10)
+                        {
+                            vector.Set(x, y, k, y);
+                            hints.Add(vector);
+                        }
+                    }
+                    else if (currentMode == GameMode.Subtract)
+                    {
+                        int result = mapApple[x, y];
+                        for (int j = x + 1; j <= k; j++)
+                        {
+                            result -= mapApple[j, y];
+                        }
+                        if (result == 10)
+                        {
+                            vector.Set(x, y, k, y);
+                            hints.Add(vector);
+                        }
                     }
                 }
             }
         }
     }
 
-    #region ��ư �׼�
     public void OnResetButton()
     {
         SceneManager.LoadScene("Main");
@@ -364,5 +390,4 @@ public class GameControl: MonoBehaviour
             hintBox.gameObject.SetActive(true);
         }
     }
-    #endregion
 }
