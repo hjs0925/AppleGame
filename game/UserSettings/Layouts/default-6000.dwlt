@@ -121,8 +121,8 @@ MonoBehaviour:
     y: 506
     width: 1222
     height: 348
-  m_MinSize: {x: 100, y: 100}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 101, y: 126}
+  m_MaxSize: {x: 4001, y: 4026}
   m_ActualView: {fileID: 17}
   m_Panes:
   - {fileID: 12}
@@ -345,7 +345,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 08720000
     m_LastClickedID: 29192
-    m_ExpandedIDs: 00000000a8710000aa710000ac71000000ca9a3b
+    m_ExpandedIDs: 00000000927100009471000096710000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -374,7 +374,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 00000000a8710000aa710000ac710000
+    m_ExpandedIDs: 00000000927100009471000096710000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -453,8 +453,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Inspector\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 1222
-    y: 78
+    x: 1223
+    y: 24
     width: 377
     height: 828
   m_SerializedDataModeController:
@@ -503,7 +503,7 @@ MonoBehaviour:
   m_Pos:
     serializedVersion: 2
     x: 0
-    y: 78
+    y: 24
     width: 301.5
     height: 480
   m_SerializedDataModeController:
@@ -520,7 +520,7 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 60e9fdff
+      m_SelectedIDs: 
       m_LastClickedID: 0
       m_ExpandedIDs: d4b0feffe6b0feff24b2feff44b2fefff2c3ffffdcdbffffeedbffff2eddffff4eddffff0efbffff907000009e760000b6760000
       m_RenameOverlay:
@@ -1235,8 +1235,8 @@ MonoBehaviour:
     m_TextWithWhitespace: "Game\u200B"
   m_Pos:
     serializedVersion: 2
-    x: 302.5
-    y: 78
+    x: 303.5
+    y: 24
     width: 917.5
     height: 480
   m_SerializedDataModeController:
@@ -1308,7 +1308,7 @@ MonoBehaviour:
       height: 540
     m_MinimalGUI: 1
   m_defaultScale: 0.85
-  m_LastWindowPixelSize: {x: 1835, y: 960}
+  m_LastWindowPixelSize: {x: 917.5, y: 480}
   m_ClearInEditMode: 1
   m_NoCameraWarning: 1
   m_LowResolutionForAspectRatios: 01000000000000000000
@@ -1337,7 +1337,7 @@ MonoBehaviour:
   m_Pos:
     serializedVersion: 2
     x: 0
-    y: 584
+    y: 530
     width: 1221
     height: 322
   m_SerializedDataModeController:

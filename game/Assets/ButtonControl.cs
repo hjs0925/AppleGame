@@ -9,6 +9,14 @@ public class ButtonControl : MonoBehaviour
     {
         SceneManager.LoadScene("Main");
     }
+    public void OnHelpButton()
+    {
+        SceneManager.LoadScene("Help");
+    }
+    public void OnTitleButton()
+    {
+        SceneManager.LoadScene("Title");
+    }
 
     public void OnQuitButton()
     {

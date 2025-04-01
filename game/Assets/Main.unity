@@ -1279,9 +1279,10 @@ MonoBehaviour:
   hintBox: {fileID: 599115170}
   modeText: {fileID: 1821748757}
   TM: {fileID: 1975335832}
+  Hint: {fileID: 1062054540}
   horizontalLength: 15
   verticalLength: 8
-  comboTime: 10
+  comboTime: 7
   nothing: 0
   score: 0
   comboDelta: 0

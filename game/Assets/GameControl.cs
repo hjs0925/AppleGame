@@ -22,6 +22,7 @@ public class GameControl : MonoBehaviour
     public RectTransform hintBox;
     public TextMeshProUGUI modeText;
     public TimeManager TM;
+    public Button Hint;
     [Header("Game Settings")]
     public int horizontalLength;
     public int verticalLength;
@@ -411,7 +412,12 @@ private void calculateAnswer()
         }
     }
 
-    private void FindHints()
+    private AppleMeta GetAppleAt(int x, int y)
+{
+    return applesList.FirstOrDefault(a => a.coor.x == x && a.coor.y == y && a.isOn);
+}
+
+private void FindHints()
 {
     answerCoors = new List<Vector2Int>();
     hints.Clear();
@@ -425,10 +431,20 @@ private void calculateAnswer()
             for (int length = 2; length <= horizontalLength - y; length++)
             {
                 List<int> values = new List<int>();
+                bool hasEmpty = false;
+
                 for (int k = 0; k < length; k++)
                 {
-                    values.Add(mapApple[x, y + k]);
+                    AppleMeta apple = GetAppleAt(x, y + k);
+                    if (apple == null)
+                    {
+                        hasEmpty = true;
+                        break;
+                    }
+                    values.Add(apple.number);
                 }
+
+                if (hasEmpty) continue;
 
                 bool isValid = false;
                 if (currentMode == GameMode.Add)
@@ -451,10 +467,20 @@ private void calculateAnswer()
             for (int length = 2; length <= verticalLength - x; length++)
             {
                 List<int> values = new List<int>();
+                bool hasEmpty = false;
+
                 for (int k = 0; k < length; k++)
                 {
-                    values.Add(mapApple[x + k, y]);
+                    AppleMeta apple = GetAppleAt(x + k, y);
+                    if (apple == null)
+                    {
+                        hasEmpty = true;
+                        break;
+                    }
+                    values.Add(apple.number);
                 }
+
+                if (hasEmpty) continue;
 
                 bool isValid = false;
                 if (currentMode == GameMode.Add)
@@ -475,6 +501,8 @@ private void calculateAnswer()
         }
     }
 }
+
+
     private bool IsValidSubtractCombo(List<int> values)
 {
     if (values.Count < 2)
@@ -506,6 +534,7 @@ private void calculateAnswer()
 
     public void OnHintButton()
     {
+        Hint.gameObject.SetActive(false);
         if (hints.Count == 0)
         {
             Debug.Log("No more Hints!");
