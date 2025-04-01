@@ -10,7 +10,7 @@ public class AppleMeta : MonoBehaviour
     public bool isAnimated;
     public Vector2Int coor;
 
-    private Transform selectZone;   // ¼±ÅÃµÇ¾úÀ» ¶§, ÇÏÀÌ¶óÀÌÆ®
+    private Transform selectZone;   // ï¿½ï¿½ï¿½ÃµÇ¾ï¿½ï¿½ï¿½ ï¿½ï¿½, ï¿½ï¿½ï¿½Ì¶ï¿½ï¿½ï¿½Æ®
     private Rigidbody2D RB;
 
     private List<Vector2> throwForces;
@@ -74,4 +74,13 @@ public class AppleMeta : MonoBehaviour
             isOn = false;
         }
     }
+    public AppleMeta Clone()
+{
+    AppleMeta copy = new AppleMeta();
+    copy.number = this.number;
+    copy.coor = this.coor;
+    copy.isOn = this.isOn;
+    return copy;
+}
+
 }

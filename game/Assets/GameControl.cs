@@ -41,6 +41,9 @@ public class GameControl : MonoBehaviour
     private int[,] mapApple;
     public List<Vector4> hints;
     private List<Vector2Int> answerCoors;
+    private Dictionary<GameMode, BoardState> savedStates = new Dictionary<GameMode, BoardState>();
+
+    
 
     private void Awake()
 {
@@ -48,6 +51,7 @@ public class GameControl : MonoBehaviour
     applesList = new List<AppleMeta>();
     selectList = new List<AppleMeta>();
     mapApple = new int[verticalLength, horizontalLength];
+    
     hints = new List<Vector4>();
 
     // Subtract 모드일 때 가로 길이 홀수면 1 줄이기
@@ -315,7 +319,10 @@ private void calculateAnswer()
 
     public void OnToggleModeButton()
 {
-    // 기존 사과 제거
+    // 현재 상태 저장
+    SaveCurrentModeState();
+
+    // 기존 오브젝트 제거
     foreach (AppleMeta apple in applesList)
     {
         if (apple != null)
@@ -327,10 +334,11 @@ private void calculateAnswer()
     // 모드 전환
     currentMode = (currentMode == GameMode.Add) ? GameMode.Subtract : GameMode.Add;
 
-    // 새로운 보드 세팅
-    InitBoard();
+    // 상태 불러오기 또는 새로 만들기
+    LoadOrInitModeState();
     UpdateModeUI();
 }
+
 
     private void UpdateModeUI()
     {
@@ -549,4 +557,73 @@ private void FindHints()
             hintBox.gameObject.SetActive(true);
         }
     }
+    private void SaveCurrentModeState()
+{
+    if (!savedStates.ContainsKey(currentMode))
+        savedStates.Add(currentMode, new BoardState(applesList, mapApple));
+    else
+        savedStates[currentMode] = new BoardState(applesList, mapApple);
+}
+    private void LoadOrInitModeState()
+{
+    if (savedStates.ContainsKey(currentMode))
+    {
+        BoardState state = savedStates[currentMode];
+        applesList = new List<AppleMeta>();
+        mapApple = (int[,])state.map.Clone();
+
+        foreach (var meta in state.apples)
+        {
+            GameObject newApple = Instantiate(apple, meta.position, Quaternion.identity);
+            AppleMeta am = newApple.GetComponent<AppleMeta>();
+            am.number = meta.number;
+            am.coor = meta.coor;
+            am.isOn = meta.isOn;
+
+            newApple.name = $"Apple ({meta.coor.x}, {meta.coor.y})";
+            newApple.SetActive(meta.isOn);
+            applesList.Add(am);
+        }
+
+        FindHints();
+    }
+    else
+    {
+        InitBoard(); // 저장된 상태 없으면 새로 생성
+    }
+}
+
+    [System.Serializable]
+    public class AppleMetaData
+{
+    public int number;
+    public Vector2Int coor;
+    public Vector3 position;
+    public bool isOn;
+}
+
+    [System.Serializable]
+    public class BoardState
+{
+    public List<AppleMetaData> apples;
+    public int[,] map;
+
+    public BoardState(List<AppleMeta> appleList, int[,] mapApple)
+    {
+        apples = new List<AppleMetaData>();
+        foreach (var am in appleList)
+        {
+            apples.Add(new AppleMetaData
+            {
+                number = am.number,
+                coor = am.coor,
+                position = am.transform.position,
+                isOn = am.isOn
+            });
+        }
+
+        map = (int[,])mapApple.Clone();
+    }
+}
+
 }
