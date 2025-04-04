@@ -1,4 +1,3 @@
-// GameControl.cs (최적화 + 힌트 없음 수정 포함)
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -268,9 +267,11 @@ public class GameControl : MonoBehaviour
     public void OnHintButton()
     {
         if ((currentMode == GameMode.Add && usedHintInAdd) || (currentMode == GameMode.Subtract && usedHintInSubtract)) return;
+        
+        FindHints();
+        
         if (hints.Count == 0)
         {
-            Debug.Log("힌트 없음!");
             hintBox.gameObject.SetActive(false);
             StartCoroutine(ShowNoHintMessage());
             return;
@@ -291,16 +292,25 @@ public class GameControl : MonoBehaviour
 
     private IEnumerator ShowNoHintMessage()
     {
+        hintBox.gameObject.SetActive(false);
         noHintText.gameObject.SetActive(true);
         noHintText.text = "힌트 없음!";
-
+        
         CanvasGroup cg = noHintText.GetComponent<CanvasGroup>();
         if (cg == null) cg = noHintText.gameObject.AddComponent<CanvasGroup>();
-
-        cg.alpha = 1f;
-        yield return new WaitForSeconds(2f);
-        cg.alpha = 0f;
+        
+        float duration = 2f;
+        float elapsed = 0f;
+        
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            cg.alpha = Mathf.Lerp(1f, 0f, elapsed / duration);
+            yield return null;
+        }
+        
         noHintText.gameObject.SetActive(false);
+        cg.alpha = 1f;
     }
 
     public void OnResetButton() => SceneManager.LoadScene("Main");
@@ -387,7 +397,7 @@ public class GameControl : MonoBehaviour
                 applesList.Add(am);
             }
         }
-        else // Add 모드
+        else
         {
             for (int i = 0; i < verticalLength; i++)
             {
